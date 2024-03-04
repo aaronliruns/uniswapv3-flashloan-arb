@@ -9,27 +9,30 @@ async function main() {
   // Need this to convert ETH into WETH (Wrapped Ether) to cover the fees
   const weth = await ethers.getContractAt("IWETH9", WETH_ADDRESS);
 
-  // Deploy Flashloan contract
-  // const Flashloan = await ethers.getContractFactory("Flashloan");
-  // const flashloan = await Flashloan.deploy(
-  //   USDC_ADDRESS,
-  //   WETH_ADDRESS,
-  //   POOL_FEE
-  // );
 
-  const flashloan = await ethers.deployContract("Flashloan", [USDC_ADDRESS,WETH_ADDRESS,POOL_FEE]);
+  // const flashloan = await ethers.deployContract("Flashloan", [USDC_ADDRESS,WETH_ADDRESS,POOL_FEE]);
 
+  // await flashloan.waitForDeployment();
+
+  [owner, signer2, signer3] = await ethers.getSigners();
+  //Owner of contract is the deployer
+  Flashloan = await ethers.getContractFactory('Flashloan', owner);
+  flashloan = await Flashloan.deploy();
   await flashloan.waitForDeployment();
 
   console.log(`flashloan address= ${flashloan.target}`);
 
+  await flashloan.connect(owner).initArbPool(USDC_ADDRESS, WETH_ADDRESS, POOL_FEE);
+
   // Get some WETH to cover fee and approve Flashloan contract to use it.
   // Fee: 1 ETH * 0.3% = 0.003 ETH
   await weth.approve(flashloan.target, ethers.parseEther("0.003"));
+  // Deposit ether to get wrapped ether
   await weth.deposit({ value: ethers.parseEther("0.003") });
 
+
   // Execute flashloan to borrow 1 ETH.
-  await flashloan.flash(0, ethers.parseEther("1"));
+  await flashloan.connect(owner).flash(0, ethers.parseEther("1"));
 }
 
 // We recommend this pattern to be able to use async/await everywhere

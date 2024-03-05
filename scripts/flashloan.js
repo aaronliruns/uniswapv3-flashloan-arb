@@ -30,9 +30,15 @@ async function main() {
   // Deposit ether to get wrapped ether
   await weth.deposit({ value: ethers.parseEther("0.003") });
 
+  balance = await flashloan.connect(owner).wethBalance();
+  console.log(`Current balance of WETH = ${balance}`);
+
 
   // Execute flashloan to borrow 1 ETH.
   await flashloan.connect(owner).flash(0, ethers.parseEther("1"));
+
+  balance = await flashloan.connect(owner).wethBalance();
+  console.log(`Current balance of WETH = ${balance}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

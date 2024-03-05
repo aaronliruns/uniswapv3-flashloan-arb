@@ -9,7 +9,7 @@ import "./interfaces/IWETH.sol";
 
 contract Flashloan {
 
-    address public owner;
+    address private owner;
 
     address private constant FACTORY =
         0x1F98431c8aD98523631AE4a59f267346ea31F984;
@@ -27,9 +27,6 @@ contract Flashloan {
     IERC20 private  token1;
 
     IUniswapV3Pool private  pool;
-
-    uint public wethBalance;
-
 
 	constructor() {
 		owner = msg.sender;
@@ -55,23 +52,27 @@ contract Flashloan {
     }
 
 
-    function wrapEther() external payable {
+    receive() external payable {}
 
-        uint256 ETHAmount = msg.value;
 
-        //create WETH from ETH
-        if (ETHAmount != 0) {
-            IWETH9(WETH_ADDR).deposit{ value: ETHAmount }();
-            wethBalance += ETHAmount;
+    function withdraw(uint256 amount) public onlyOwner {
+        address payable to = payable(owner);
+        to.transfer(amount);
+    }
+
+    function ethBalance() external onlyOwner view returns(uint256)  {
+        return address(this).balance;
+    }
+
+    function wethBalance() external onlyOwner view returns(uint256) {
+        return IWETH9(WETH_ADDR).balanceOf(address(this));
+    }
+
+    function unwrapEther(uint256 amount) external onlyOwner {
+        if (amount != 0) {
+            IWETH9(WETH_ADDR).withdraw(amount);
         }
     }
-    
-
-    function receiveTokens(uint amount, address token) external onlyOwner {
-
-		IERC20(token).transferFrom(msg.sender, address(this), amount);
-		tokenBalance[token] += amount;
-	}
 
     function flash(uint256 amount0, uint256 amount1) external onlyOwner {
         bytes memory data = abi.encode(
@@ -97,11 +98,8 @@ contract Flashloan {
         );
 
         // Do your abitrage below...
-
-        console.log("Balance of token0:");
-        console.log(token0.balanceOf(address(this)));
         console.log("Balance of token1:"); 
-        console.log(token1.balanceOf(address(this)));
+        console.log(token1.balanceOf(address(this)));//1000000000000000000
 
         // Repay borrow
         if (fee0 > 0) {
@@ -109,14 +107,22 @@ contract Flashloan {
             token0.transfer(address(pool), decoded.amount0 + fee0);
         }
         if (fee1 > 0) {
+            //FROM: decoded.caller = 0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266 (Forking Account #0)
+            //TO:   address(this) = flashloan.target (deployed address)
+            //decoded.amount1 = 1000000000000000000
+
+            //Transfer fee from owner's wallet to the contract
             token1.transferFrom(decoded.caller, address(this), fee1);
+            //Paying off the loan (back to the pool) with fee
             token1.transfer(address(pool), decoded.amount1 + fee1);
+            console.log("Balance of token1:"); 
+            console.log(token1.balanceOf(address(this))); //0
         }
 
-        console.log("Fee0:");
-        console.log(fee0);//0
-        console.log("Fee1:");
-        console.log(fee1);//3000000000000000 - 0.003 ETH
+        // console.log("Fee0:");
+        // console.log(fee0);//0
+        // console.log("Fee1:");
+        // console.log(fee1);//3000000000000000 - 0.003 ETH
     }
 
     modifier onlyOwner {

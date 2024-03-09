@@ -68,6 +68,10 @@ contract Flashloan {
         return IWETH9(WETH_ADDR).balanceOf(address(this));
     }
 
+    function tokenBalance(address tokenAddress) external onlyOwner view returns (uint256) {
+        return IERC20(tokenAddress).balanceOf(address(this));
+    }
+
     function unwrapEther(uint256 amount) external onlyOwner {
         if (amount != 0) {
             IWETH9(WETH_ADDR).withdraw(amount);
@@ -130,10 +134,6 @@ contract Flashloan {
 		_;
 	}
 }
-
-
-
-
 
 
 

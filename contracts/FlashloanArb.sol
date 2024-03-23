@@ -6,16 +6,24 @@ import "./interfaces/IERC20.sol";
 import "./interfaces/IUniswapV3Pool.sol";
 import "./libraries/PoolAddress.sol";
 import "./interfaces/IWETH.sol";
+import "./libraries/SafeERC20.sol";
 
-contract Flashloan {
+contract FlashloanArb {
+
+    using SafeERC20 for IERC20;
 
     address private owner;
-
     address private constant FACTORY =
         0x1F98431c8aD98523631AE4a59f267346ea31F984;
 
     address private constant  WETH_ADDR =
     0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+
+    uint256 private constant MAX_INT =
+        115792089237316195423570985008687907853269984665640564039457584007913129639935;
+
+    address private constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+    IERC20 private constant usdc = IERC20(USDC);
 
     struct FlashCallbackData {
         uint256 amount0;
@@ -79,6 +87,7 @@ contract Flashloan {
     }
 
     function flash(uint256 amount0, uint256 amount1) external onlyOwner {
+        usdc.safeApprove(address(router), MAX_INT); 
         bytes memory data = abi.encode(
             FlashCallbackData({
                 amount0: amount0,
@@ -129,9 +138,7 @@ contract Flashloan {
         // console.log(fee1);//3000000000000000 - 0.003 ETH
     }
     
-    function getBalanceOfToken(address _address) external onlyOwner view returns (uint256)   {
-        return IERC20(_address).balanceOf(address(this));
-    }
+
 
     modifier onlyOwner {
 		require(msg.sender == owner, "Only onwer may call this function!");

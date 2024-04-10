@@ -7,7 +7,7 @@ async function main() {
   const POOL_FEE = 3000; // 0.30% tier
 
   // Need this to convert ETH into WETH (Wrapped Ether) to cover the fees
-  const weth = await ethers.getContractAt("IWETH9", WETH_ADDRESS);
+  const weth = await ethers.getContractAt("IWETH", WETH_ADDRESS);
 
 
   // const flashloan = await ethers.deployContract("Flashloan", [USDC_ADDRESS,WETH_ADDRESS,POOL_FEE]);
@@ -25,6 +25,7 @@ async function main() {
   await flashloan.connect(owner).initArbPool(USDC_ADDRESS, WETH_ADDRESS, POOL_FEE);
 
   // Get some WETH to cover fee and approve Flashloan contract to use it.
+  // Loan fee has already been deposited to the contract
   // Fee: 1 ETH * 0.3% = 0.003 ETH
   await weth.approve(flashloan.target, ethers.parseEther("0.003"));
   // Deposit ether to get wrapped ether

@@ -59,15 +59,6 @@ contract FlashloanArb {
         return PoolAddress.computeAddress(FACTORY, poolKey);
     }
 
-
-    receive() external payable {}
-
-
-    function withdraw(uint256 amount) public onlyOwner {
-        address payable to = payable(owner);
-        to.transfer(amount);
-    }
-
     function ethBalance() external onlyOwner view returns(uint256)  {
         return address(this).balance;
     }
@@ -80,14 +71,7 @@ contract FlashloanArb {
         return IERC20(tokenAddress).balanceOf(address(this));
     }
 
-    function unwrapEther(uint256 amount) external onlyOwner {
-        if (amount != 0) {
-            IWETH(WETH_ADDR).withdraw(amount);
-        }
-    }
-
     function flash(uint256 amount0, uint256 amount1) external onlyOwner {
-        usdc.safeApprove(address(router), MAX_INT); 
         bytes memory data = abi.encode(
             FlashCallbackData({
                 amount0: amount0,
@@ -110,32 +94,18 @@ contract FlashloanArb {
             (FlashCallbackData)
         );
 
-        // Do your abitrage below...
-        console.log("Balance of token1:"); 
-        console.log(token1.balanceOf(address(this)));//1000000000000000000
-
         // Repay borrow
         if (fee0 > 0) {
-            token0.transferFrom(decoded.caller, address(this), fee0);
+            console.log("tokenBorrowed0OnThisContract=",token0.balanceOf(address(this)));
+            console.log("returning=", decoded.amount0 + fee0);
             token0.transfer(address(pool), decoded.amount0 + fee0);
         }
         if (fee1 > 0) {
-            //FROM: decoded.caller = 0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266 (Forking Account #0)
-            //TO:   address(this) = flashloan.target (deployed address)
-            //decoded.amount1 = 1000000000000000000
-
-            //Transfer fee from owner's wallet to the contract
-            token1.transferFrom(decoded.caller, address(this), fee1);
-            //Paying off the loan (back to the pool) with fee
-            token1.transfer(address(pool), decoded.amount1 + fee1);
-            console.log("Balance of token1:"); 
-            console.log(token1.balanceOf(address(this))); //0
+            //console.log("tokenBorrowed1OnThisContract=",token1.balanceOf(address(this)));
+            console.log("tokenBorrowed1OnThisContract=", IERC20(USDC).balanceOf(address(this)));
+            console.log("returning=", decoded.amount1 + fee1);
+            IERC20(USDC).transfer(address(pool), decoded.amount1 + fee1);
         }
-
-        // console.log("Fee0:");
-        // console.log(fee0);//0
-        // console.log("Fee1:");
-        // console.log(fee1);//3000000000000000 - 0.003 ETH
     }
     
 

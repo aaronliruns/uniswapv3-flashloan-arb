@@ -11,18 +11,19 @@ const USDC_WHALE = "0x7713974908be4bed47172370115e8b1219f4a5f0";
 
 
 
-describe("UniswapV3Arb", function () {
+describe("UniswapV3FlashLoan", function () {
   
-  describe("UniswapV3MultiHopSwap", function () {
-    let accounts, BORROW_AMOUNT;
-    const initialFundingHuman = "10"; 
+  describe("UniswapV3FlashLoanOnly", function () {
+    let accounts, BORROW_AMOUNT, receipt;
+    const initialFundingHuman = "10";
+    const amountToBorrow = "1000"; 
     const DECIMALS = 6; //USDC Demicals
     
     beforeEach(async function () {
       accounts = await ethers.getSigners();
       let usdc = await ethers.getContractAt("IERC20", USDC);
 
-      BORROW_AMOUNT = ethers.parseUnits("30", DECIMALS);
+      BORROW_AMOUNT = ethers.parseUnits(amountToBorrow, DECIMALS);
 
       console.log(
         "USDC balance of whale: ",
@@ -30,7 +31,7 @@ describe("UniswapV3Arb", function () {
       );
 
       const Flashloan = await ethers.getContractFactory(
-        "FlashloanArb"
+        "Flashloan"
       );
 
       flashloan = await Flashloan.deploy();
@@ -61,14 +62,23 @@ describe("UniswapV3Arb", function () {
 
 
   it("borrow USDC flash loan", async () => {
-    await flashloan.initArbPool(USDC, WETH, POOL_FEE);
-    
+    const tx = await flashloan.initArbPool(USDC, WETH, POOL_FEE,BORROW_AMOUNT, 0);
+    receipt = await tx.wait();
     console.log(`Borrowing ${BORROW_AMOUNT} USDC`);
-    await flashloan.flash(BORROW_AMOUNT, 0);
-
     balance = await flashloan.tokenBalance(USDC);
     console.log(`Current balance of USDC = ${balance}`);
 
+  });
+
+  it("Get Gas in USD", async () => {
+    const gasPrice = receipt.gasPrice;
+    const gasUsed = receipt.gasUsed;
+    const gasUsedETH = gasPrice * gasUsed;
+    console.log(
+      "Total Gas USD: " +
+        ethers.formatEther(gasUsedETH.toString()) * 3507 // exchange rate today
+    );
+    expect(gasUsedETH).not.equal(0);
   });
   
   });

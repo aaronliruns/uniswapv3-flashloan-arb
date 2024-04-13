@@ -1,13 +1,22 @@
-# Sample Hardhat Project
+# Building blocks of Uniswap v3 Flashloan Trianglugar Arbitrage
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
-
-Try running some of the following tasks:
+To resolve dependencies:
 
 ```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
+npx hardhat 
 ```
+
+What you can learn from this demo project:
+
+* Mainnet fork and impersonation
+    * hardhat.config.js
+    * utils/utilities.js
+
+* Flashloan
+    * npx hardhat test test/flash-loan-test-usdc.js
+
+* Multi hop swap
+    * npx hardhat test test/multihop-swap-test-usdc.js
+
+
+

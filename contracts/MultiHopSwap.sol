@@ -20,13 +20,9 @@ contract MultiHopSwap {
     ISwapRouter02 private constant ROUTER = ISwapRouter02(SWAP_ROUTER_02);
     uint256 private constant MAX_INT =
         115792089237316195423570985008687907853269984665640564039457584007913129639935;
-    // IWETH private constant weth = IWETH(WETH);
-    // IERC20 private constant dai = IERC20(DAI);
 
     function swapExactInputMultiHop(uint256 amountIn) external {
 
-        // weth.transferFrom(msg.sender, address(this), amountIn);
-        // weth.approve(address(ROUTER), amountIn);
         // execution reverted: STF means execution is reverted by require assertion in TransferHelper.safeTransferFrom function.
         IERC20(USDC).safeApprove(address(ROUTER), MAX_INT);
         IERC20(WETH).safeApprove(address(ROUTER), MAX_INT);
@@ -50,9 +46,3 @@ contract MultiHopSwap {
         return IERC20(tokenAddress).balanceOf(address(this));
     }
 }
-
-// function test_swapExactInputMultiHop() public {
-//         swap.swapExactInputMultiHop(AMOUNT_IN, 1);
-//         uint256 d1 = dai.balanceOf(address(this));
-//         assertGt(d1, 0, "DAI balance = 0");
-// }

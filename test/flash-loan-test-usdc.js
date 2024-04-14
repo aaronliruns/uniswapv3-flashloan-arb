@@ -14,13 +14,12 @@ const USDC_WHALE = "0x7713974908be4bed47172370115e8b1219f4a5f0";
 describe("UniswapV3FlashLoan", function () {
   
   describe("UniswapV3FlashLoanOnly", function () {
-    let accounts, BORROW_AMOUNT, receipt;
+    let BORROW_AMOUNT, receipt;
     const initialFundingHuman = "10";
     const amountToBorrow = "1000"; 
     const DECIMALS = 6; //USDC Demicals
     
     beforeEach(async function () {
-      accounts = await ethers.getSigners();
       let usdc = await ethers.getContractAt("IERC20", USDC);
 
       BORROW_AMOUNT = ethers.parseUnits(amountToBorrow, DECIMALS);
@@ -67,7 +66,7 @@ describe("UniswapV3FlashLoan", function () {
     console.log(`Borrowing ${BORROW_AMOUNT} USDC`);
     balance = await flashloan.tokenBalance(USDC);
     console.log(`Current balance of USDC = ${balance}`);
-
+    expect(balance).not.equal(0);
   });
 
   it("Get Gas in USD", async () => {

@@ -1,22 +1,24 @@
-# Building blocks of Uniswap v3 Flashloan Trianglugar Arbitrage
+# Uniswap v3 Flashloan Trianglugar Arbitrage - Building blocks
 
-To resolve dependencies:
+To resolve dependencies before running test cases :
 
 ```shell
-npx hardhat 
+npm install 
 ```
 
-What you can learn from this demo project:
+This project demostrates use cases as below:
 
-* Mainnet fork and impersonation
-    * hardhat.config.js
-    * utils/utilities.js
+* Mainnet forking and impersonation
+    * [Mainnet forking configuration in hardhat config file](./hardhat.config.js) ***Please replace with your own Alchemy API key***
+    * [Impersonation in two ways](./utils/utilities.js)
 
-* Flashloan
-    * npx hardhat test test/flash-loan-test-usdc.js
+* Flashloan (Uniswap v3)
+    * [Flashloan contract](./contracts/Flashloan.sol)
+    * To run test case `npx hardhat test test/flash-loan-test-usdc.js`
 
-* Multi hop swap
-    * npx hardhat test test/multihop-swap-test-usdc.js
+* Multi hop swap (Uniswap v3)
+    * [Multi-hop swap](./contracts/MultiHopSwap.sol)
+    * To run test case `npx hardhat test test/multihop-swap-test-usdc.js`
 
 
 

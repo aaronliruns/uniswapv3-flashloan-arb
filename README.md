@@ -1,13 +1,24 @@
-# Sample Hardhat Project
+# Uniswap v3 Flashloan Trianglugar Arbitrage - Building blocks
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
-
-Try running some of the following tasks:
+To resolve dependencies before running test cases :
 
 ```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
+npm install 
 ```
+
+This project demostrates use cases as below:
+
+* Mainnet forking and impersonation
+    * [Mainnet forking configuration in hardhat config file](./hardhat.config.js) ***Please replace with your own Alchemy API key***
+    * [Impersonation in two ways](./utils/utilities.js)
+
+* Flashloan (Uniswap v3)
+    * [Flashloan contract](./contracts/Flashloan.sol)
+    * To run test case `npx hardhat test test/flash-loan-test-usdc.js`
+
+* Multi hop swap (Uniswap v3)
+    * [Multi-hop swap](./contracts/MultiHopSwap.sol)
+    * To run test case `npx hardhat test test/multihop-swap-test-usdc.js`
+
+
+

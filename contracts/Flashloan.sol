@@ -112,7 +112,7 @@ contract Flashloan {
 
 
     modifier onlyOwner {
-		require(msg.sender == owner, "Only onwer may call this function!");
+		require(msg.sender == owner, "Only onwer can call this function!");
 		_;
 	}
 }

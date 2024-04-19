@@ -71,10 +71,10 @@ contract Flashloan {
             FlashCallbackData({
                 amount0: amount0,
                 amount1: amount1,
-                caller: msg.sender
+                caller: address(this)
             })
         );
-        IUniswapV3Pool(pool).flash(address(this), amount0, amount1, data);
+        pool.flash(address(this), amount0, amount1, data);
     }
 
     function initArbPool(address _token0, address _token1, uint24 _fee, uint256 amount0, uint256 amount1) external onlyOwner {
@@ -105,7 +105,7 @@ contract Flashloan {
         if (fee1 > 0) {
             console.log("tokenBorrowed1OnThisContract=", IERC20(USDC).balanceOf(address(this)));
             console.log("returning=", decoded.amount1 + fee1);
-            IERC20(USDC).transfer(address(pool), decoded.amount1 + fee1);
+            token1.transfer(address(pool), decoded.amount1 + fee1);
         }
     }
     

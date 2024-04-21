@@ -8,9 +8,6 @@ const USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
 const POOL_FEE = 3000; // 0.30% tier
 const USDC_WHALE = "0x7713974908be4bed47172370115e8b1219f4a5f0";
 
-
-
-
 describe("UniswapV3FlashLoan", function () {
   
   describe("UniswapV3FlashLoanOnly", function () {
@@ -45,7 +42,6 @@ describe("UniswapV3FlashLoan", function () {
         DECIMALS
       );
       console.log('Impersonation completed.')
-
     });
 
 
@@ -79,7 +75,6 @@ describe("UniswapV3FlashLoan", function () {
     );
     expect(gasUsedETH).not.equal(0);
   });
-  
   });
 });
 

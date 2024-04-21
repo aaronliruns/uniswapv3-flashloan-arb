@@ -5,14 +5,8 @@ import "hardhat/console.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/IUniswapV3Pool.sol";
 import "./libraries/PoolAddress.sol";
-import "./interfaces/IWETH.sol";
-import "./libraries/SafeERC20.sol";
 
 contract Flashloan {
-
-    using SafeERC20 for IERC20;
-
-    address private owner;
     address private constant FACTORY =
         0x1F98431c8aD98523631AE4a59f267346ea31F984;
 
@@ -36,10 +30,6 @@ contract Flashloan {
 
     IUniswapV3Pool private  pool;
 
-	constructor() {
-		owner = msg.sender;
-	}
-
 
     function getPool(
         address _token0,
@@ -54,19 +44,11 @@ contract Flashloan {
         return PoolAddress.computeAddress(FACTORY, poolKey);
     }
 
-    function ethBalance() external onlyOwner view returns(uint256)  {
-        return address(this).balance;
-    }
-
-    function wethBalance() external onlyOwner view returns(uint256) {
-        return IWETH(WETH_ADDR).balanceOf(address(this));
-    }
-
-    function tokenBalance(address tokenAddress) external onlyOwner view returns (uint256) {
+    function tokenBalance(address tokenAddress) external view returns (uint256) {
         return IERC20(tokenAddress).balanceOf(address(this));
     }
 
-    function flash(uint256 amount0, uint256 amount1) private onlyOwner {
+    function flash(uint256 amount0, uint256 amount1) private {
         bytes memory data = abi.encode(
             FlashCallbackData({
                 amount0: amount0,
@@ -77,7 +59,7 @@ contract Flashloan {
         pool.flash(address(this), amount0, amount1, data);
     }
 
-    function initArbPool(address _token0, address _token1, uint24 _fee, uint256 amount0, uint256 amount1) external onlyOwner {
+    function initArbPool(address _token0, address _token1, uint24 _fee, uint256 amount0, uint256 amount1) external {
 		token0 = IERC20(_token0);
         token1 = IERC20(_token1);
         pool = IUniswapV3Pool(getPool(_token0, _token1, _fee));
@@ -89,8 +71,6 @@ contract Flashloan {
         uint256 fee1,
         bytes calldata data
     ) external {
-        require(msg.sender == address(pool), "not authorized");
-
         FlashCallbackData memory decoded = abi.decode(
             data,
             (FlashCallbackData)
@@ -108,11 +88,4 @@ contract Flashloan {
             token1.transfer(address(pool), decoded.amount1 + fee1);
         }
     }
-    
-
-
-    modifier onlyOwner {
-		require(msg.sender == owner, "Only onwer can call this function!");
-		_;
-	}
 }

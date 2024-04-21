@@ -76,6 +76,8 @@ contract Flashloan {
             (FlashCallbackData)
         );
 
+        // DO YOUR BUSINESS HERE
+
         // Repay borrow
         if (fee0 > 0) {
             console.log("tokenBorrowed0OnThisContract=",token0.balanceOf(address(this)));

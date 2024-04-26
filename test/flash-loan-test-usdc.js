@@ -62,7 +62,7 @@ describe("UniswapV3FlashLoan", function () {
     console.log(`Borrowing ${BORROW_AMOUNT} USDC`);
     balance = await flashloan.tokenBalance(USDC);
     console.log(`Current balance of USDC = ${balance}`);
-    expect(balance).not.equal(0);
+    expect(balance).equal(7000000);
   });
 
   it("Get Gas in USD", async () => {
@@ -71,7 +71,7 @@ describe("UniswapV3FlashLoan", function () {
     const gasUsedETH = gasPrice * gasUsed;
     console.log(
       "Total Gas USD: " +
-        ethers.formatEther(gasUsedETH.toString()) * 3507 // exchange rate today
+        ethers.formatEther(gasUsedETH.toString()) * 3157.01 //exchange rate on 20 April 2024 BTC Halving
     );
     expect(gasUsedETH).not.equal(0);
   });
